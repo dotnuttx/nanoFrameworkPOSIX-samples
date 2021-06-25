@@ -1,0 +1,134 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "restore",
+            "command": "wsl",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "nuget",
+                "restore"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build",
+            "command": "wsl",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "msbuild"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "restore"
+            ]
+        },
+        {
+            "label": "deploy-ssh",
+            "command": "scp",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "${workspaceFolder}/bin/Debug/*.pe",
+                "pi@192.168.1.98:/home/pi/nf"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "deploy-uf2",
+            "command": "cp",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "${workspaceFolder}/bin/Debug/*.uf2",
+                "i:\\"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "generate-firmware"
+            ]
+        },
+        {
+            "label": "deploy-sd",
+            "command": "cp",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "${workspaceFolder}/bin/Debug/*.pe",
+                "f:\\"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "run-ssh",
+            "command": "ssh",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "-t",
+                "pi@192.168.1.98",
+                "'/home/pi/dotnet-nf nf/'"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "deploy-ssh"
+            ]
+        },
+        {
+            "label": "generate-firmware",
+            "command": "wsl",
+            //"command": "wsl echo '$(pwd)'",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "docker",
+                "run",
+                "--rm",
+                "-it",
+                "-v",
+                "'$(pwd)/bin/Debug/:/nf/'",
+                "dotnuttx/generate-pico-uf2"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+    ]
+}
