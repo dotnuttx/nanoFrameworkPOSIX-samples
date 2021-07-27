@@ -14,6 +14,10 @@ try
     GpioPin led;
 
     switch (SystemInfo.TargetName) {
+        case "beagle-v":
+            // pin 16 in the header is the gpio21
+            ledPinNumber = 21;
+        break;
         case "pi-zero":
             // pin 16 in the header is the gpio23
             ledPinNumber = 23;
