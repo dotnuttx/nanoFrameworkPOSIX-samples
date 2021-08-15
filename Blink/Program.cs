@@ -26,6 +26,10 @@ try
             // onboard LED
             ledPinNumber = 25;
         break;
+        case "esp32c3":
+            // pin 6 from DevKit is gpio8
+            ledPinNumber = 8;
+        break;
         default:
             throw new Exception($"Your target [{SystemInfo.TargetName}] does not support GPIOs");
     }
