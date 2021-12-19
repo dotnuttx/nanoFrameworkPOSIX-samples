@@ -13,6 +13,7 @@ try
     int ledPinNumber;
     int buttonPinNumber;
     PinValue ledValue = PinValue.Low;
+    PinValue buttonTriggerLevel = PinValue.High;
     GpioPin led;
     GpioPin button;
 
@@ -42,6 +43,12 @@ try
             ledPinNumber = 1;
             buttonPinNumber = 2;
         break;
+        case Platforms.MAIX_BIT_K210:
+            // onboard rgb blue / onboard boot button
+            ledPinNumber = 12;
+            buttonPinNumber = 16;
+            buttonTriggerLevel = PinValue.Low;
+        break;
         case Platforms.WSL:
             Debug.WriteLine($"The platform {SystemInfo.Platform}:{SystemInfo.TargetName} does not have GPIO support!");
             return;
@@ -61,8 +68,8 @@ try
         ledValue = !(bool)ledValue;
         led.Write(ledValue);
 
-        if (button.Read() == PinValue.High) {
-            Debug.WriteLine($"Button is pressed on {SystemInfo.Platform}");
+        if (button.Read() == buttonTriggerLevel) {
+            Debug.WriteLine($"Button is pressed on {SystemInfo.TargetName}");
         }
 
         Thread.Sleep(500);

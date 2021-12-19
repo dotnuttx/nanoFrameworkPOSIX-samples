@@ -6,6 +6,7 @@ namespace DotnetNFPosix {
         public const string PI_ZERO = "pi-zero";
         public const string ESP32_C3 = "esp32c3";
         public const string STARFIVE_JH7100 = "jh7100";
-        public const string NEZHA_ALLWINNER_D1 = "nezha";    
+        public const string NEZHA_ALLWINNER_D1 = "nezha";
+        public const string MAIX_BIT_K210 = "maix-bit";
     }
 }
