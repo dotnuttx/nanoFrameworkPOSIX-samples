@@ -44,7 +44,7 @@
             },
             "args": [
                 "${workspaceFolder}/bin/Debug/*.pe",
-                "pi@192.168.1.98:/home/pi/nf"
+                "${input:sshUser}@${input:sshHostname}:/home/${input:sshUser}/nf"
             ],
             "problemMatcher": "$msCompile",
             "dependsOn": [
@@ -98,8 +98,8 @@
             },
             "args": [
                 "-t",
-                "pi@192.168.1.98",
-                "'/home/pi/dotnet-nf nf/'"
+                "${input:sshUser}@${input:sshHostname}",
+                "'/usr/bin/dotnet-nf /home/${input:sshUser}/nf/'"
             ],
             "problemMatcher": "$msCompile",
             "dependsOn": [
@@ -107,8 +107,8 @@
             ]
         },
         {
-            "label": "generate-firmware",
-            "command": "wsl",
+            "label": "generate-firmware-pi-pico",
+            "command": "docker",
             "type": "shell",
             "options": {
                 "env": {
@@ -116,12 +116,11 @@
                 }
             },
             "args": [
-                "docker",
                 "run",
                 "--rm",
                 "-it",
                 "-v",
-                "'$(pwd)/bin/Debug/:/nf/'",
+                "${PWD}/bin/Debug/:/nf/",
                 "dotnuttx/generate-pico-uf2"
             ],
             "problemMatcher": "$msCompile",
@@ -129,5 +128,104 @@
                 "build"
             ]
         },
+        {
+            "label": "generate-firmware-k210",
+            "command": "docker",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "run",
+                "--rm",
+                "-it",
+                "-v",
+                "${PWD}/bin/Debug/:/nf/",
+                "dotnuttx/generate-maix-bit-k210"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "flash-maix-bit-k210",
+            "command": "kflash",
+            "type": "shell",
+            "args": [
+                "-p",
+                "${input:comPort}",
+                "-b",
+                "1500000",
+                "${workspaceFolder}/bin/Debug/dotnetnf.bin"
+            ],
+            "dependsOn": [
+                "generate-firmware-k210"
+            ]
+        },
+        {
+            "label": "generate-firmware-esp32c3",
+            "command": "docker",
+            "type": "shell",
+            "options": {
+                "env": {
+                    "UnoBuild": "true"
+                }
+            },
+            "args": [
+                "run",
+                "--rm",
+                "-it",
+                "-v",
+                "${PWD}/bin/Debug/:/nf/",
+                "dotnuttx/generate-bin-esp32c3"
+            ],
+            "problemMatcher": "$msCompile",
+            "dependsOn": [
+                "build"
+            ]
+        },
+        {
+            "label": "flash-esp32c3",
+            "command": "esptool.py",
+            "type": "shell",
+            "args": [
+                "--chip",
+                "esp32c3",
+                "--port",
+                "${input:comPort}",
+                "--baud",
+                "921600",
+                "write_flash",
+                "0x0",
+                "${workspaceFolder}/res/bootloader-esp32c3.bin",
+                "0x8000",
+                "${workspaceFolder}/res/partition-table-esp32c3.bin",
+                "0x10000",
+                "${workspaceFolder}/bin/Debug/dotnetnf.bin"
+            ],
+            "dependsOn": [
+                "generate-firmware-esp32c3"
+            ]
+        },
+    ],
+    "inputs": [
+        {
+            "id": "sshUser",
+            "type": "promptString",
+            "description": "The remote target username"
+        },
+        {
+            "id": "sshHostname",
+            "type": "promptString",
+            "description": "The remote target ip/hostname"
+        },
+        {
+            "id": "comPort",
+            "type": "promptString",
+            "description": "The target serial COM port"
+        }
     ]
 }
