@@ -22,6 +22,7 @@ try
             // pin 16 in the header is the gpio21
             ledPinNumber = 21;
             buttonPinNumber = 19;
+            buttonTriggerLevel = PinValue.Low;
         break;
         case Platforms.PI_ZERO:
             // pin 16 in the header is the gpio23
@@ -42,6 +43,7 @@ try
             // pin 16 in the header is the ioexpander pp1
             ledPinNumber = 1;
             buttonPinNumber = 2;
+            buttonTriggerLevel = PinValue.Low;
         break;
         case Platforms.MAIX_BIT_K210:
             // onboard rgb blue / onboard boot button
