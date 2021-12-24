@@ -16,6 +16,7 @@ try
     PinValue buttonTriggerLevel = PinValue.High;
     GpioPin led;
     GpioPin button;
+    uint plus = 0;
 
     switch (SystemInfo.TargetName) {
         case Platforms.STARFIVE_JH7100:
@@ -71,7 +72,9 @@ try
         led.Write(ledValue);
 
         if (button.Read() == buttonTriggerLevel) {
-            Debug.WriteLine($"Button is pressed on {SystemInfo.TargetName}");
+            Debug.WriteLine(
+                $"Button is pressed on {SystemInfo.OEMString} {plus}");
+            plus++;
         }
 
         Thread.Sleep(500);
