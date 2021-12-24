@@ -98,9 +98,11 @@ function taskArgumentExecute ($label, [ScriptBlock]$fnExec, $message) {
         $taskLabel = $label
         
         if ($taskLabel -match "^\d+$") {
-            $fnExec.Invoke($json.tasks[[int]::Parse($taskLabel) -1].label)
+            Invoke-Command -ScriptBlock $fnExec `
+                -ArgumentList $json.tasks[[int]::Parse($taskLabel) -1].label
         } elseif ((getTasksLabels).Contains($taskLabel)) {
-            $fnExec.Invoke($taskLabel)
+            Invoke-Command -ScriptBlock $fnExec `
+                -ArgumentList $taskLabel
         } else {
             write-error "Undefined task <$taskLabel>" 10
         }
